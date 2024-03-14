@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>replit</title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div id="login-container">
+    <div id="login-header">
+        <h2>Login</h2>
+    </div>
+    <div id="login-body">
+        <p>Welcome back, please login using your credentials.</p>
+        <form id="login-body-form" action="/login" method="post" enctype="multipart/form-data">
+            <div class="labelbox">
+                <label for="username"><small>Username:</small></label>
+            </div>
+            <br/>
+            <input type="text" id="username" name="username" placeholder="" required>
+            <br/>
+            <div class="labelbox">
+                <label for="password"><small>Password:</small></label>
+            </div>
+            <br/>
+            <input type="password" id="password" name="password" placeholder="" required>
+            <br/>
+            <div id="login-body-form-float-container">
+                <div id="login-body-form-left">
+                    <!--<input type="checkbox" id="remember" name="remember">-->
+                    <!--<label for="remember"><small>remember me?</small></label>-->
+                </div>
+                <div id="login-body-form-right">
+                    <small>forgot password?</small>
+                </div>
+            </div>
+            <input type="submit" value="Log In">
+        </form>
+    </div>
+    <div id="login-footer">
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+html, body {
+    padding: 0;
+    margin: 0;
+    font-family: Poppins, serif;
+}
+
+html, body * {
+    font-family: Poppins, serif;
+}
+
+small {
+    color: grey;
+}
+
+p {
+    color: grey;
+}
+
+.labelbox {
+    text-align: left;
+    padding: 0;
+    margin: 0;
+    margin-bottom: -1.5em;
+    position: relative;
+    z-index: 1;
+}
+
+#login-container {
+    width: 20em;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    overflow: hidden;
+}
+
+#login-body {}
+
+#login-body-form {
+    text-align: center;
+}
+
+#login-body-form input[type="text"], input[type="password"] {
+    border: none;
+    border-bottom: 2px solid grey;
+    height: 2em;
+    width: 100%;
+    outline: none;
+    font-size: 24px;
+    transition: height 0.5s ease;
+}
+
+#login-body-form input[type="text"]:focus, input[type="password"]:focus {
+    border-image: linear-gradient(45deg, purple, orange) 1;
+    height: 3em;
+}
+
+#login-body-form input[type="submit"] {
+    float: left;
+    border: none;
+    border-radius: 4px;
+    background: linear-gradient(45deg, purple, orange);
+    width: 6em;
+    height: 3em;
+    color: white;
+}
+
+#login-body-form-float-container {
+    height: 3em;
+}
+
+#login-body-form-left {
+    float: left;
+    text-align: left;
+    height: inherit;
+}
+
+#login-body-form-right {
+    float: right;
+    text-align: right;
+    height: inherit;
+}
+
+#login-body-form-left, #login-body-form-right {
+    margin-top: 1em;
+}
