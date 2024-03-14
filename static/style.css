@@ -86,3 +86,9 @@ p {
 #login-body-form-left, #login-body-form-right {
     margin-top: 1em;
 }
+
+#home-sidebar {
+    border-right: 2px solid black;
+    height: 100%;
+    width: 15em;
+}

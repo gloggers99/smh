@@ -1,5 +1,6 @@
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
+use diesel::insert_into;
 use diesel::prelude::*;
 use rocket::form::{Form, FromForm};
 use rocket::http::CookieJar;
@@ -7,7 +8,8 @@ use rocket::response::content::RawHtml;
 use rocket::response::Redirect;
 use rocket::State;
 use rocket_dyn_templates::{context, Template};
-use crate::schema::users::{logged};
+use crate::schema::users::{email, id, logged};
+use crate::schema::users::dsl::users;
 
 #[get("/login")]
 pub fn login() -> RawHtml<Template> {
@@ -20,11 +22,12 @@ pub struct LoginInformation {
     pub password: String
 }
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Clone)]
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct UserInformation {
     pub id: i32,
+    pub email: String,
     pub username: String,
     pub password: String,
     pub admin: bool,
@@ -33,7 +36,6 @@ pub struct UserInformation {
 }
 
 pub fn update_log_time(conn: &mut PgConnection, user: String) {
-    use crate::schema::users::dsl::users;
     use crate::schema::users::dsl::username;
 
     match diesel::update(users)
@@ -43,6 +45,42 @@ pub fn update_log_time(conn: &mut PgConnection, user: String) {
         Ok(_) => {},
         Err(_) => {
             eprintln!("failed to update login time!");
+        }
+    }
+}
+
+pub fn create_user(conn: &mut PgConnection, new_email: String, new_username: String, new_password: String) {
+    use crate::schema::users::dsl::username;
+    use crate::schema::users::dsl::password;
+
+    match insert_into(users)
+        .values(
+            (
+                email.eq(new_email),
+                username.eq(new_username),
+                password.eq(new_password)
+            )
+        ).execute(conn) {
+        Ok(_) => {},
+        Err(_) => {
+            eprintln!("failed to create user!");
+        }
+    }
+}
+
+pub fn request_user_information(conn: &mut PgConnection, userid: i32) -> Option<UserInformation> {
+
+    match users
+        .filter(id.eq(userid))
+        .limit(1)
+        .select(UserInformation::as_select())
+        .load(conn) {
+        Ok(results) => {
+            Some(results[0].clone())
+        },
+        Err(_) => {
+            eprintln!("failed to get user information!");
+            None
         }
     }
 }
@@ -57,8 +95,10 @@ pub fn login_post(login_information: Form<LoginInformation>,
         Err(_) => return Redirect::to("/")
     };
 
+    //create_user(&mut conn, String::from("will"), String::from("test"));
+
     use crate::schema::users::dsl::users;
-    let results = users
+    let mut results = users
         .filter(crate::schema::users::username.eq(login_information.clone().username))
         .limit(1)
         .select(UserInformation::as_select())
@@ -67,7 +107,17 @@ pub fn login_post(login_information: Form<LoginInformation>,
 
     // no accounts found with that username
     if results.len() < 1 {
-        return Redirect::to("/");
+        // search using email as filter:
+        results = users
+            .filter(crate::schema::users::email.eq(login_information.clone().username))
+            .limit(1)
+            .select(UserInformation::as_select())
+            .load(&mut *conn)
+            .unwrap();
+        
+        if results.len() < 1 {
+            return Redirect::to("/");
+        }
     }
 
     let user = &results[0];
@@ -76,7 +126,7 @@ pub fn login_post(login_information: Form<LoginInformation>,
         // set user cookie because we logged in successfully
         // TODO: use private cookies in the future.
         update_log_time(&mut conn, login_information.clone().username);
-        cookies.add(("userid", user.id.to_string()));
+        cookies.add_private(("userid", user.id.to_string()));
         Redirect::to("/home")
     } else {
         Redirect::to("/")
