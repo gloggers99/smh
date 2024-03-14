@@ -7,6 +7,7 @@ use rocket::response::content::RawHtml;
 use rocket::response::Redirect;
 use rocket::State;
 use rocket_dyn_templates::{context, Template};
+use crate::schema::users::{logged};
 
 #[get("/login")]
 pub fn login() -> RawHtml<Template> {
@@ -31,10 +32,25 @@ pub struct UserInformation {
     pub logged: SystemTime
 }
 
+pub fn update_log_time(conn: &mut PgConnection, user: String) {
+    use crate::schema::users::dsl::users;
+    use crate::schema::users::dsl::username;
+
+    match diesel::update(users)
+        .filter(username.eq(user))
+        .set(logged.eq(SystemTime::now()))
+        .execute(conn) {
+        Ok(_) => {},
+        Err(_) => {
+            eprintln!("failed to update login time!");
+        }
+    }
+}
+
 #[post("/login", data = "<login_information>")]
 pub fn login_post(login_information: Form<LoginInformation>,
                   cookies: &CookieJar<'_>,
-                  database: &State<Arc<Mutex<PgConnection>>>) -> Redirect 
+                  database: &State<Arc<Mutex<PgConnection>>>) -> Redirect
 {
     let mut conn = match database.lock() {
         Ok(conn) => conn,
@@ -59,6 +75,7 @@ pub fn login_post(login_information: Form<LoginInformation>,
     if user.password == login_information.clone().password {
         // set user cookie because we logged in successfully
         // TODO: use private cookies in the future.
+        update_log_time(&mut conn, login_information.clone().username);
         cookies.add(("userid", user.id.to_string()));
         Redirect::to("/home")
     } else {
