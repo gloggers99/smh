@@ -7,16 +7,18 @@ use rocket::http::CookieJar;
 use rocket::State;
 use rocket_dyn_templates::{context, Template};
 use crate::login;
+use serde::Serialize;
 
-#[derive(Queryable, Selectable, Clone)]
+#[derive(Queryable, Selectable, Clone, Serialize)]
 #[diesel(table_name = crate::schema::posts)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct PostInformation {
     pub id: i32,
     pub created: SystemTime,
+    pub title: String,
     pub author: String,
+    pub description: String,
     pub content: String,
-    pub description: String
 }
 
 #[derive(FromForm, Clone)]

@@ -2,6 +2,7 @@ mod login;
 mod schema;
 mod home;
 mod posts;
+mod api;
 
 #[macro_use] extern crate rocket;
 
@@ -36,14 +37,16 @@ fn rocket() -> _ {
         .manage(Arc::new(Mutex::new(establish_connection())))
         .mount("/",
                routes![
-                   index,
+                   index,             // - GET  /
 
-                   login::login,
-                   login::login_post,
+                   login::login,      // - GET  /login
+                   login::login_post, // - POST /login
 
-                   posts::post_post,
+                   posts::post_post,  // - POST /post
 
-                   home::home
+                   api::get_post,     // - GET  /api/post/<i32>
+
+                   home::home         // - GET  /home
                ]
         )
         .mount("/static", FileServer::from(relative!("static")))

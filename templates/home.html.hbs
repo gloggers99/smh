@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <div id="alert-box">
+        {{alert}}
+    </div>
     <div id="home-container">
         <div id="home-create-post-container">
             <form enctype="multipart/form-data" action="/post" method="post">
@@ -26,5 +29,6 @@
             <script></script>
         </div>
     </div>
+    <script src="/static/alertsystem.js"></script>
 </body>
 </html>
