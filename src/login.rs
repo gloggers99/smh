@@ -12,8 +12,15 @@ use crate::schema::users::{email, id, logged};
 use crate::schema::users::dsl::users;
 
 #[get("/login")]
-pub fn login() -> RawHtml<Template> {
-    RawHtml(Template::render("login", context! {}))
+pub fn login(cookies: &CookieJar<'_>) -> Result<Redirect, RawHtml<Template>> {
+    match cookies.get_private("userid") {
+        Some(_) => {
+            Ok(Redirect::to("/home"))
+        },
+        None => {
+            Err(RawHtml(Template::render("login", context! {})))
+        }
+    }
 }
 
 #[derive(FromForm, Clone)]
@@ -79,7 +86,6 @@ pub fn request_user_information(conn: &mut PgConnection, userid: i32) -> Option<
             Some(results[0].clone())
         },
         Err(_) => {
-            eprintln!("failed to get user information!");
             None
         }
     }
@@ -98,22 +104,26 @@ pub fn login_post(login_information: Form<LoginInformation>,
     //create_user(&mut conn, String::from("will"), String::from("test"));
 
     use crate::schema::users::dsl::users;
-    let mut results = users
+    let mut results = match users
         .filter(crate::schema::users::username.eq(login_information.clone().username))
         .limit(1)
         .select(UserInformation::as_select())
-        .load(&mut *conn)
-        .unwrap();
+        .load(&mut *conn) {
+        Ok(res) => res,
+        Err(_) => return Redirect::to("/")
+    };
 
     // no accounts found with that username
     if results.len() < 1 {
         // search using email as filter:
-        results = users
+        results = match users
             .filter(crate::schema::users::email.eq(login_information.clone().username))
             .limit(1)
             .select(UserInformation::as_select())
-            .load(&mut *conn)
-            .unwrap();
+            .load(&mut *conn) {
+            Ok(res) => res,
+            Err(_) => return Redirect::to("/")
+        };
         
         if results.len() < 1 {
             return Redirect::to("/");
@@ -124,7 +134,6 @@ pub fn login_post(login_information: Form<LoginInformation>,
 
     if user.password == login_information.clone().password {
         // set user cookie because we logged in successfully
-        // TODO: use private cookies in the future.
         update_log_time(&mut conn, login_information.clone().username);
         cookies.add_private(("userid", user.id.to_string()));
         Redirect::to("/home")
