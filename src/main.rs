@@ -1,6 +1,7 @@
 mod login;
 mod schema;
 mod home;
+mod posts;
 
 #[macro_use] extern crate rocket;
 
@@ -39,6 +40,8 @@ fn rocket() -> _ {
 
                    login::login,
                    login::login_post,
+
+                   posts::post_post,
 
                    home::home
                ]

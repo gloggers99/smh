@@ -8,8 +8,22 @@
 </head>
 <body>
     <div id="home-container">
-        <div id="home-sidebar">
-            logged in as {{username}}
+        <div id="home-create-post-container">
+            <form enctype="multipart/form-data" action="/post" method="post">
+                <label for="title">title</label>
+                <input type="text" id="title" name="title">
+                <br />
+                <label for="description">description</label>
+                <input type="text" id="description" name="description">
+                <br />
+                <label for="content">content</label>
+                <input type="text" id="content" name="content">
+                <br />
+                <input type="submit">
+            </form>
+        </div>
+        <div id="home-posts">
+            <script></script>
         </div>
     </div>
 </body>

@@ -1,13 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 html, body {
     padding: 0;
     margin: 0;
-    font-family: Poppins, serif;
+    font-family: Roboto, serif;
 }
 
 html, body * {
-    font-family: Poppins, serif;
+    font-family: Roboto, serif;
+}
+
+h1, h2, h3, h4, h5 {
+    margin-top: 0;
 }
 
 small {
@@ -87,8 +92,22 @@ p {
     margin-top: 1em;
 }
 
-#home-sidebar {
-    border-right: 2px solid black;
-    height: 100%;
-    width: 15em;
+#home-topbar {
+    width: 100vh;
+    height: 3em;
+    padding: 1em 5em;
+
+}
+
+.home-topbar-button {
+    width: 6em;
+    height: 2em;
+    overflow: hidden;
+    text-align: center;
+    border-bottom: 2px solid grey;
+    transition: height 0.5s ease;
+}
+
+.home-topbar-button:hover {
+    height: 2.25em;
 }
